@@ -127,7 +127,7 @@ button {
 <input type="email" id="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="please enter a valid email in lowercase">
 
 <label for="phone">phone</label>
-<input type="tel" id="phone" required pattern="^\d{10}$" title="please enter a 10-digit phone number (numbers only)">
+<input type="tel" id="phone" required pattern="^\d{10}$" inputmode="numeric" title="please enter a 10-digit phone number (numbers only)">
 </div>
 
 <!-- pickup info card -->
@@ -241,7 +241,7 @@ document.getElementById('breadForm').addEventListener('submit', async e=>{
         form.reportValidity();  // shows native browser error bubbles
         return;                 // stop submission
     }
-
+    
     e.preventDefault();  // only prevent after validation passes
 
     const email = document.getElementById('email');
