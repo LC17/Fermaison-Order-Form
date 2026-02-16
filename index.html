@@ -233,7 +233,16 @@ function calculateTotal(){
 
 // form submission
 document.getElementById('breadForm').addEventListener('submit', async e=>{
-    e.preventDefault();
+    
+    const form = e.target;
+
+    // trigger built-in HTML validation
+    if (!form.checkValidity()) {
+        form.reportValidity();  // shows native browser error bubbles
+        return;                 // stop submission
+    }
+
+    e.preventDefault();  // only prevent after validation passes
 
     const email = document.getElementById('email');
     const phone = document.getElementById('phone');
