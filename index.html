@@ -231,6 +231,14 @@ function calculateTotal(){
     totalEl.textContent = total.toFixed(2);
 }
 
+    
+    // auto-clean phone input (local 10 digits only)
+    const phoneInput = document.getElementById('phone');
+
+    phoneInput.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+});
+    
 // form submission
 document.getElementById('breadForm').addEventListener('submit', async e=>{
     
