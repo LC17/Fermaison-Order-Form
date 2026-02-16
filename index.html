@@ -234,6 +234,24 @@ function calculateTotal(){
 // form submission
 document.getElementById('breadForm').addEventListener('submit', async e=>{
     e.preventDefault();
+
+    const email = document.getElementById('email');
+    const phone = document.getElementById('phone');
+
+    // ✅ validate email and phone before proceeding
+    if(!email.checkValidity()){
+        alert(email.title);
+        email.focus();
+        return;
+    }
+
+    if(!phone.checkValidity()){
+        alert(phone.title);
+        phone.focus();
+        return;
+    }
+
+    //gathers form data and sends it
     const data = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
