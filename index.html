@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boutique Bread Order Form</title>
+<style>
+body { font-family:'Courier New', monospace; margin:0; padding:0; background:#fff; color:#000; }
+main { max-width:900px; margin:40px auto; padding:0 20px; }
+.card { border:1px solid #000; border-radius:8px; padding:20px; margin-bottom:30px; box-shadow:2px 2px 5px rgba(0,0,0,0.05);}
+.card h2 { text-align:center; margin-top:0; margin-bottom:15px; font-size:1.8em;}
+.logo { display:block; max-width:200px; margin:0 auto 10px auto;}
+.description { text-align:center; margin-bottom:20px;}
+label { display:block; margin-top:15px; font-weight:bold;}
+input[type="text"], input[type="email"], input[type="tel"], select, textarea, input[type="number"] { width:100%; padding:8px; margin-top:5px; border:1px solid #000; border-radius:5px; font-family:'Courier New', monospace; font-size:1em;}
+textarea { resize: vertical; }
+.menu-item { display:flex; justify-content:space-between; align-items:center; margin-top:10px;}
+.menu-item input[type="number"] { width:60px; margin-left:10px;}
+button { display:block; width:100%; padding:15px; font-size:1.2em; margin-top:20px; cursor:pointer; border:1px solid #000; border-radius:5px; background:#fff; font-family:'Courier New', monospace;}
+.radio-group { display:flex; gap:20px; margin-top:10px;}
+.total { font-weight:bold; font-size:1.3em; margin-top:20px; text-align:right;}
+</style>
+</head>
+<body>
+<main>
+<form id="breadForm">
+
+<!-- Header Card -->
+<div class="card">
+<img src="logo.png" alt="Logo" class="logo">
+<div class="description">
+<p>Enter your first description line here</p>
+<p>Enter your second description line here</p>
+</div>
+</div>
+
+<!-- Menu Card -->
+<div class="card">
+<h2>Menu</h2>
+<div id="menuContainer">Loading menu...</div>
+<p class="total">Total: $<span id="total">0</span></p>
+</div>
+
+<!-- Customer Info Card -->
+<div class="card">
+<h2>Customer Info</h2>
+<label for="name">Full Name</label>
+<input type="text" id="name" required>
+<label for="email">Email</label>
+<input type="email" id="email" required>
+<label for="phone">Phone</label>
+<input type="tel" id="phone" required>
+</div>
+
+<!-- Pickup Info Card -->
+<div class="card">
+<h2>Pickup Info</h2>
+<p>Enter pickup instructions or description here.</p>
+<label for="pickup">Choose Pickup Time</label>
+<select id="pickup" required>
+<option value="">Select a time</option>
+<option>Thursday 11am - 2pm</option>
+<option>Friday 11am - 2pm</option>
+<option>Sunday 9am - 2pm</option>
+</select>
+</div>
+
+<!-- Payment Card -->
+<div class="card">
+<h2>Payment Methods</h2>
+<p>Please select your payment method:</p>
+<div class="radio-group">
+<label><input type="radio" name="payment" value="Apple Pay" required> Apple Pay</label>
+<label><input type="radio" name="payment" value="Cash App"> Cash App</label>
+<label><input type="radio" name="payment" value="Venmo"> Venmo</label>
+<label><input type="radio" name="payment" value="Zelle"> Zelle</label>
+</div>
+</div>
+
+<!-- Additional Info Card -->
+<div class="card">
+<h2>Additional Info</h2>
+<label for="allergies">Allergies</label>
+<textarea id="allergies" rows="2"></textarea>
+<label for="requests">Special Requests</label>
+<textarea id="requests" rows="2"></textarea>
+<label>Subscribe to Newsletter?</label>
+<div class="radio-group">
+<label><input type="radio" name="newsletter" value="Yes" required> Yes</label>
+<label><input type="radio" name="newsletter" value="No"> No</label>
+</div>
+<label>Learn more about Supper Club?</label>
+<div class="radio-group">
+<label><input type="radio" name="supperclub" value="Yes" required> Yes</label>
+<label><input type="radio" name="supperclub" value="No"> No</label>
+</div>
+</div>
+
+<!-- Socials Card -->
+<div class="card">
+<h2>Socials</h2>
+<p>Follow us on Instagram / TikTok / Facebook / etc.</p>
+</div>
+
+<!-- Feedback Card -->
+<div class="card">
+<h2>Feedback</h2>
+<p>Leave your rating & feedback (tied to Google Listing)</p>
+<textarea id="feedback" rows="3"></textarea>
+</div>
+
+<button type="submit">Submit Order</button>
+</form>
+</main>
+
+<script>
+// Replace this with your single Google Apps Script Web App URL
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxVqyFEka1496mqRYpTA483VgdfBTOu15SW3b2VnKPujewBk4cousFGOWm-PAFlsqcqYA/exec';
+
+// Load menu dynamically
+const menuContainer = document.getElementById('menuContainer');
+const totalEl = document.getElementById('total');
+let menuCheckboxes = [];
+let menuQtys = [];
+
+fetch(WEB_APP_URL)
+.then(res => res.json())
+.then(data => {
+    // If returned data is menu array, populate menu
+    if(Array.isArray(data)){
+        menuContainer.innerHTML = '';
+        data.forEach((item,i)=>{
+            const div = document.createElement('div');
+            div.classList.add('menu-item');
+            div.innerHTML = `<label><input type="checkbox" class="menu-checkbox" data-price="${item.price}"> ${item.name} ($${item.price})</label>
+                             <input type="number" class="menu-qty" value="0" min="0" disabled>`;
+            menuContainer.appendChild(div);
+        });
+        menuCheckboxes = document.querySelectorAll('.menu-checkbox');
+        menuQtys = document.querySelectorAll('.menu-qty');
+
+        menuCheckboxes.forEach((cb,i)=>{
+            cb.addEventListener('change', ()=>{
+                menuQtys[i].disabled = !cb.checked;
+                if(!cb.checked) menuQtys[i].value=0;
+                calculateTotal();
+            });
+        });
+        menuQtys.forEach((q,i)=>q.addEventListener('input', calculateTotal));
+    }
+});
+
+function calculateTotal(){
+    let total=0;
+    menuCheckboxes.forEach((cb,i)=>{
+        if(cb.checked){
+            total += parseFloat(cb.dataset.price)*(parseInt(menuQtys[i].value)||0);
+        }
+    });
+    totalEl.textContent = total.toFixed(2);
+}
+
+// Submit form
+document.getElementById('breadForm').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const data = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        total: totalEl.textContent,
+        pickup: document.getElementById('pickup').value,
+        payment: document.querySelector('input[name="payment"]:checked')?.value,
+        allergies: document.getElementById('allergies').value,
+        requests: document.getElementById('requests').value,
+        newsletter: document.querySelector('input[name="newsletter"]:checked')?.value,
+        supperclub: document.querySelector('input[name="supperclub"]:checked')?.value,
+        feedback: document.getElementById('feedback').value
+    };
+
+    // Add dynamic bread quantities
+    menuCheckboxes.forEach((cb,i)=>{
+        data[cb.parentElement.textContent.split(' ($')[0].trim()] = cb.checked ? parseInt(menuQtys[i].value)||0 : 0;
+    });
+
+    try{
+        const res = await fetch(WEB_APP_URL,{
+            method:'POST',
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if(result.result==="success"){
+            alert("Order submitted successfully!");
+            document.getElementById('breadForm').reset();
+            totalEl.textContent="0";
+        }else{
+            alert("Error submitting order: "+result.message);
+        }
+    }catch(err){
+        alert("Error submitting order: "+err);
+    }
+});
+</script>
+</body>
+</html>
