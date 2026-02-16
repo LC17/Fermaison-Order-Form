@@ -197,6 +197,7 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxVqyFEka1496mqRYpT
 const menuContainer = document.getElementById('menuContainer');
 const totalEl = document.getElementById('total');
 let menuQtys = [];
+let menuItemsNames = [];
 
 fetch(WEB_APP_URL)
 .then(res => res.json())
@@ -206,35 +207,29 @@ fetch(WEB_APP_URL)
         data.forEach((item,i)=>{
             const div = document.createElement('div');
             div.classList.add('menu-item');
-            div.innerHTML = `<label><input type="checkbox" class="menu-checkbox" data-price="${item.price}"> ${item.name.toLowerCase()} ($${item.price})</label>
-                             <input type="number" class="menu-qty" value="0" min="0" disabled>`;
+            div.innerHTML = `<label>${item.name.toLowerCase()} ($${item.price})</label>
+                             <input type="number" class="menu-qty" data-price="${item.price}" value="0" min="0">`;
             menuContainer.appendChild(div);
         });
-        menuCheckboxes = document.querySelectorAll('.menu-checkbox');
         menuQtys = document.querySelectorAll('.menu-qty');
-
-        menuCheckboxes.forEach((cb,i)=>{
-            cb.addEventListener('change', ()=>{
-                menuQtys[i].disabled = !cb.checked;
-                if(!cb.checked) menuQtys[i].value=0;
-                calculateTotal();
-            });
+        menuItemsNames = Array.from(menuQtys).map((q,i)=>{
+            return data[i].name.toLowerCase();
         });
-        menuQtys.forEach((q,i)=>q.addEventListener('input', calculateTotal));
+
+        menuQtys.forEach(q => q.addEventListener('input', calculateTotal));
     }
 });
 
 function calculateTotal(){
-    let total=0;
-    menuCheckboxes.forEach((cb,i)=>{
-        if(cb.checked){
-            total += parseFloat(cb.dataset.price)*(parseInt(menuQtys[i].value)||0);
-        }
+    let total = 0;
+    menuQtys.forEach(q=>{
+        const qty = parseInt(q.value) || 0;
+        total += qty * parseFloat(q.dataset.price);
     });
     totalEl.textContent = total.toFixed(2);
 }
 
-// submit form
+// form submission
 document.getElementById('breadForm').addEventListener('submit', async e=>{
     e.preventDefault();
     const data = {
@@ -250,8 +245,9 @@ document.getElementById('breadForm').addEventListener('submit', async e=>{
         supperclub: document.querySelector('input[name="supperclub"]:checked')?.value,
         feedback: document.getElementById('feedback').value
     };
-    menuCheckboxes.forEach((cb,i)=>{
-        data[cb.parentElement.textContent.split(' ($')[0].trim()] = cb.checked ? parseInt(menuQtys[i].value)||0 : 0;
+
+    menuQtys.forEach((q,i)=>{
+        data[menuItemsNames[i]] = parseInt(q.value) || 0;
     });
 
     try{
@@ -263,6 +259,7 @@ document.getElementById('breadForm').addEventListener('submit', async e=>{
         if(result.result==="success"){
             alert("order submitted successfully!");
             document.getElementById('breadForm').reset();
+            menuQtys.forEach(q=>q.value=0);
             totalEl.textContent="0";
         }else{
             alert("error submitting order: "+result.message);
@@ -271,6 +268,7 @@ document.getElementById('breadForm').addEventListener('submit', async e=>{
         alert("error submitting order: "+err);
     }
 });
+
 </script>
 </body>
 </html>
