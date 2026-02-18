@@ -377,23 +377,24 @@ document.getElementById('breadForm').addEventListener('submit', async e=>{
             body: JSON.stringify(data)
         });
         const result = await res.json();
-        if(result.result==="success"){
+        if(result.result === "success"){
     const mainEl = document.querySelector('main');
+    const handle = paymentHandles[data.payment] || "please follow the payment instructions";
+
     mainEl.innerHTML = `
     <div class="payment-card">
         <h2>complete your payment</h2>
         <p>send <strong>$${data.total}</strong> via <strong>${data.payment}</strong></p>
         <p>payment details:</p>
         <ul>
-            <li>venmo: @fermaison</li>
-            <li>cash app: $fermaison</li>
-            <li>zelle: email@yourbank.com</li>
+            <li>${handle}</li>
         </ul>
         <p>your order is confirmed once payment is received.</p>
-        <p>thank you for supporting fermaison. ❤️</p>
+        <p>thank you for supporting fermaison. 💕</p>
     </div>
     `;
 }
+
         else{
             alert("error submitting order: "+result.message);
         }
