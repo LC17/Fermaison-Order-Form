@@ -358,18 +358,6 @@ function calculateTotal(){
     });
     totalEl.textContent = total.toFixed(2);
 }
-
-
-
-function calculateTotal(){
-    let total = 0;
-    menuQtys.forEach(q=>{
-        const qty = parseInt(q.value) || 0;
-        total += qty * parseFloat(q.dataset.price);
-    });
-    totalEl.textContent = total.toFixed(2);
-}
-
     
     // auto-clean phone input (local 10 digits only)
     const phoneInput = document.getElementById('phone');
