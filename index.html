@@ -377,22 +377,49 @@ document.getElementById('breadForm').addEventListener('submit', async e=>{
             body: JSON.stringify(data)
         });
         const result = await res.json();
-        if(result.result === "success"){
+        if(result.result === "success") {
     const mainEl = document.querySelector('main');
+
+    // simple, readable order number: F-MMDD-RR
+    const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const rand = Math.floor(Math.random() * 90 + 10); // 2-digit random
+    const orderNumber = `F-${month}${day}-${rand}`;
+
     const handle = paymentHandles[data.payment] || "please follow the payment instructions";
 
     mainEl.innerHTML = `
     <div class="payment-card">
         <h2>complete your payment</h2>
+        <p><strong>order number:</strong> <span id="orderNumber">${orderNumber}</span>
+        <button class="copy-btn" data-copy="#orderNumber">copy</button></p>
         <p>send <strong>$${data.total}</strong> via <strong>${data.payment}</strong></p>
+        <p>please include your order number in the payment notes/message.</p>
         <p>payment details:</p>
         <ul>
-            <li>${handle}</li>
+            <li id="paymentHandle">${handle}</li>
         </ul>
+        <button class="copy-btn" data-copy="#paymentHandle">copy handle</button>
         <p>your order is confirmed once payment is received.</p>
-        <p>thank you for supporting fermaison. 💕</p>
+        <p>thank you for supporting hyperlocal, simple. 💕</p>
     </div>
     `;
+
+    // copy-to-clipboard functionality
+    const copyButtons = document.querySelectorAll('.copy-btn');
+    copyButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = document.querySelector(btn.dataset.copy);
+            if(target){
+                navigator.clipboard.writeText(target.textContent)
+                    .then(()=> alert('copied!'))
+                    .catch(()=> alert('copy failed'));
+            }
+        });
+    });
+}
+
 }
 
         else{
