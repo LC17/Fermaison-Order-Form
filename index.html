@@ -369,11 +369,23 @@ document.getElementById('breadForm').addEventListener('submit', async e=>{
         });
         const result = await res.json();
         if(result.result==="success"){
-            alert("order submitted successfully!");
-            document.getElementById('breadForm').reset();
-            menuQtys.forEach(q=>q.value=0);
-            totalEl.textContent="0";
-        }else{
+    const mainEl = document.querySelector('main');
+    mainEl.innerHTML = `
+    <div class="payment-card">
+        <h2>complete your payment</h2>
+        <p>send <strong>$${data.total}</strong> via <strong>${data.payment}</strong></p>
+        <p>payment details:</p>
+        <ul>
+            <li>venmo: @fermaison</li>
+            <li>cash app: $fermaison</li>
+            <li>zelle: email@yourbank.com</li>
+        </ul>
+        <p>your order is confirmed once payment is received.</p>
+        <p>thank you for supporting fermaison. ❤️</p>
+    </div>
+    `;
+}
+        else{
             alert("error submitting order: "+result.message);
         }
     }catch(err){
