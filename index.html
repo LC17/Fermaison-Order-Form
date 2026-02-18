@@ -302,7 +302,7 @@ button:active {
 // replace with your google apps script web app url
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbykUEuITzJ1prj3qkd98kbSFYtxiqaC6rcDtgzHFnQWKLu6nzb__8DrgMwZ2X8hCxlKvg/exec';
 
-// dynamic menu load with fallback
+// dynamic menu load 
 const menuContainer = document.getElementById('menuContainer');
 const totalEl = document.getElementById('total');
 let menuQtys = [];
@@ -348,6 +348,8 @@ async function loadMenu() {
     }
 }
 
+    //call function to load menu
+    loadMenu();
 
     
     // auto-clean phone input (local 10 digits only)
