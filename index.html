@@ -276,6 +276,15 @@ const totalEl = document.getElementById('total');
 let menuQtys = [];
 let menuItemsNames = [];
 
+// payment handles
+const paymentHandles = {
+    "venmo": "@fermaison",
+    "cash app": "$fermaison",
+    "apple pay": "use Apple Pay at checkout",
+    "zelle": "email@yourbank.com"
+};
+
+    
 fetch(WEB_APP_URL)
 .then(res => res.json())
 .then(data => {
