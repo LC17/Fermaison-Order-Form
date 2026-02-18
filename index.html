@@ -319,15 +319,33 @@ function calculateTotal() {
 }
     
 // load menu from web app
+// Google Apps Script web app URL
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbykUEuITzJ1prj3qkd98kbSFYtxiqaC6rcDtgzHFnQWKLu6nzb__8DrgMwZ2X8hCxlKvg/exec';
+
+// DOM elements
+const menuContainer = document.getElementById('menuContainer');
+const totalEl = document.getElementById('total');
+let menuQtys = [];
+let menuItemsNames = [];
+
+// calculate total
+function calculateTotal() {
+    let total = 0;
+    menuQtys.forEach(q => {
+        const qty = parseInt(q.value) || 0;
+        total += qty * parseFloat(q.dataset.price);
+    });
+    totalEl.textContent = total.toFixed(2);
+}
+
+// load menu from web app
 async function loadMenu() {
     try {
         const res = await fetch(WEB_APP_URL);
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         const menu = await res.json();
 
-        if (!Array.isArray(menu)) throw new Error('Menu is not an array');
-
         menuContainer.innerHTML = '';
+
         menu.forEach((item, i) => {
             const div = document.createElement('div');
             div.classList.add('menu-item');
@@ -348,8 +366,8 @@ async function loadMenu() {
     }
 }
 
-    //call function to load menu
-    loadMenu();
+// trigger menu load on page load
+document.addEventListener('DOMContentLoaded', loadMenu);
 
     
     // auto-clean phone input (local 10 digits only)
