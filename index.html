@@ -335,8 +335,34 @@ fetch(WEB_APP_URL)
         });
 
         menuQtys.forEach(q => q.addEventListener('input', calculateTotal));
+    } else {
+        menuContainer.textContent = 'menu could not be loaded';
     }
+})
+.catch(err => {
+    console.error('Menu fetch error:', err);
+    // fallback menu if fetch fails
+    const fallbackMenu = [
+        { name: "original foccacia", price: 18 },
+        { name: "original foccacia [1/2 sheet]", price: 10 },
+        { name: "rustic honey loaf", price: 12 }
+        { name: "r & d special [full size]", price: 15 }
+        { name: "r & d special [sample size]", price: 8 }
+    ];
+    menuContainer.innerHTML = '';
+    fallbackMenu.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('menu-item');
+        div.innerHTML = `<label>${item.name.toLowerCase()} ($${item.price})</label>
+                         <input type="number" class="menu-qty" data-price="${item.price}" value="0" min="0">`;
+        menuContainer.appendChild(div);
+    });
+    menuQtys = document.querySelectorAll('.menu-qty');
+    menuItemsNames = Array.from(menuQtys).map((q,i)=> fallbackMenu[i].name.toLowerCase());
+    menuQtys.forEach(q => q.addEventListener('input', calculateTotal));
+    menuContainer.textContent += ' (using fallback menu)';
 });
+
 
 function calculateTotal(){
     let total = 0;
