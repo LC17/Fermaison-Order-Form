@@ -308,56 +308,47 @@ const totalEl = document.getElementById('total');
 let menuQtys = [];
 let menuItemsNames = [];
 
-const fallbackMenu = [
-    { name: "original foccacia", price: 18 },
-    { name: "original foccacia [1/2 sheet]", price: 10 },
-    { name: "rustic honey loaf", price: 12 },
-    { name: "r & d special [full size]", price: 15 },
-    { name: "r & d special [sample size]", price: 8 }
-];
-
-// function to render menu
-function renderMenu(menu) {
-    menuContainer.innerHTML = '';
-    menu.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.classList.add('menu-item');
-        div.innerHTML = `<label>${item.name.toLowerCase()} ($${item.price})</label>
-                         <input type="number" class="menu-qty" data-price="${item.price}" value="0" min="0">`;
-        menuContainer.appendChild(div);
-    });
-    menuQtys = document.querySelectorAll('.menu-qty');
-    menuItemsNames = Array.from(menuQtys).map((q, i) => menu[i].name.toLowerCase());
-    menuQtys.forEach(q => q.addEventListener('input', calculateTotal));
-}
-
-// try fetching menu from Google Apps Script
-fetch(WEB_APP_URL)
-.then(res => res.json())
-.then(data => {
-    if(Array.isArray(data) && data.length > 0){
-        renderMenu(data);
-    } else {
-        console.warn("Invalid menu data from server, using fallback menu");
-        renderMenu(fallbackMenu);
-        menuContainer.textContent += ' (using fallback menu)';
-    }
-})
-.catch(err => {
-    console.error("Menu fetch error:", err);
-    renderMenu(fallbackMenu);
-    menuContainer.textContent += ' (using fallback menu)';
-});
-
-// calculate total function
-function calculateTotal(){
+// calculate total
+function calculateTotal() {
     let total = 0;
-    menuQtys.forEach(q=>{
+    menuQtys.forEach(q => {
         const qty = parseInt(q.value) || 0;
         total += qty * parseFloat(q.dataset.price);
     });
     totalEl.textContent = total.toFixed(2);
 }
+    
+// load menu from web app
+async function loadMenu() {
+    try {
+        const res = await fetch(WEB_APP_URL);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        const menu = await res.json();
+
+        if (!Array.isArray(menu)) throw new Error('Menu is not an array');
+
+        menuContainer.innerHTML = '';
+        menu.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.classList.add('menu-item');
+            div.innerHTML = `
+                <label>${item.name.toLowerCase()} ($${item.price})</label>
+                <input type="number" class="menu-qty" data-price="${item.price}" value="0" min="0">
+            `;
+            menuContainer.appendChild(div);
+        });
+
+        menuQtys = document.querySelectorAll('.menu-qty');
+        menuItemsNames = Array.from(menuQtys).map((q, i) => menu[i].name.toLowerCase());
+        menuQtys.forEach(q => q.addEventListener('input', calculateTotal));
+
+    } catch (err) {
+        console.error('Menu load failed:', err);
+        menuContainer.textContent = 'Menu could not load. Please try again later.';
+    }
+}
+
+
     
     // auto-clean phone input (local 10 digits only)
     const phoneInput = document.getElementById('phone');
