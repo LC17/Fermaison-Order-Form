@@ -322,17 +322,13 @@ function calculateTotal() {
 
 // load menu from Google Apps Script
 async function loadMenu() {
-    console.log('Attempting to load menu...');
+    console.log('Loading local test menu...');
+
     try {
-        const res = await fetch(WEB_APP_URL);
-        console.log('Fetch response:', res);
-
-        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-
-        const menu = await res.json();
-        console.log('Parsed menu JSON:', menu);
-
-        if (!Array.isArray(menu)) throw new Error('Menu is not an array');
+        const menu = [
+            { name: "Sourdough", price: 12 },
+            { name: "Focaccia", price: 15 }
+        ];
 
         menuContainer.innerHTML = '';
 
@@ -352,9 +348,10 @@ async function loadMenu() {
 
     } catch (err) {
         console.error('Menu load failed:', err);
-        menuContainer.textContent = 'Menu could not load. See console for details.';
+        menuContainer.textContent = 'Menu could not load.';
     }
 }
+
 
 
 // auto-clean phone input (10 digits only)
