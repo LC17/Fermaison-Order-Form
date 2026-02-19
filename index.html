@@ -348,7 +348,7 @@ async function loadMenu() {
 
         menuQtys = document.querySelectorAll('.menu-qty');
         menuItemsNames = Array.from(menuQtys).map((q, i) => menu[i].name.toLowerCase());
-        menuQtys.forEach(q => q.addEventListener('input', calculateTotal'));
+        menuQtys.forEach(q => q.addEventListener('input', calculateTotal));
 
     } catch (err) {
         console.error('Menu load failed:', err);
